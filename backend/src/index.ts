@@ -1,25 +1,33 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import productRoutes from "./routes/products.routes";
+import cartRoutes from "./routes/cart.routes";
+import orderRoutes from "./routes/orders.routes";
+import productRoutes, {
+  randomProductsHandler,
+  shuffledProductsHandler,
+} from "./routes/products.routes";
 
 const app = express();
 
-const corsOrigins = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:4173",
-  "http://127.0.0.1:4173",
-];
-
+// Allow any dev origin (Vite port/host) so /cart/preview POST is not blocked by CORS.
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 app.use(express.json());
 
+// Register before `app.use("/products", …)` so Express 5 does not treat `random` / `shuffled`
+// as `/:id` inside the mounted router (which caused 404s).
+app.get("/products/random", randomProductsHandler);
+app.get("/products/shuffled", shuffledProductsHandler);
+
 app.use("/products", productRoutes);
+app.use("/cart", cartRoutes);
+app.use("/orders", orderRoutes);
 
 app.use(
   (

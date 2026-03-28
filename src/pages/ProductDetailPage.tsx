@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { fetchProductById } from '@/api/products'
 import { StoreLayout } from '@/components/layout/StoreLayout'
 import {
   formatInr,
   getBrand,
   getPriceParts,
+  getProductImages,
   getProductName,
   specificationEntries,
 } from '@/lib/productDisplay'
+import { useCart } from '@/context/CartContext'
 import type { Product } from '@/types/product'
 
 function StarRow() {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <span className="flex text-amber-400">
         {'★★★★☆'.split('').map((c, i) => (
           <span key={i}>{c}</span>
@@ -28,10 +30,14 @@ function StarRow() {
 export default function ProductDetailPage() {
   const { id: rawId } = useParams()
   const id = rawId ? decodeURIComponent(rawId) : ''
+  const navigate = useNavigate()
+  const { addItem, replaceCart } = useCart()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeImage, setActiveImage] = useState(0)
+  const [qty, setQty] = useState(1)
 
   useEffect(() => {
     if (!id) {
@@ -42,6 +48,8 @@ export default function ProductDetailPage() {
     let cancelled = false
     setLoading(true)
     setError(null)
+    setActiveImage(0)
+    setQty(1)
     fetchProductById(id)
       .then((data) => {
         if (!cancelled) setProduct(data.product)
@@ -61,6 +69,11 @@ export default function ProductDetailPage() {
       cancelled = true
     }
   }, [id])
+
+  const images = useMemo(
+    () => (product ? getProductImages(product) : []),
+    [product],
+  )
 
   if (loading) {
     return (
@@ -88,14 +101,31 @@ export default function ProductDetailPage() {
     )
   }
 
-  const name = getProductName(product.title)
-  const brand = getBrand(product.title)
-  const { mrp, selling } = getPriceParts(product.price)
+  const prod = product
+
+  const name = getProductName(prod.title)
+  const brand = getBrand(prod.title)
+  const { mrp, selling } = getPriceParts(prod.price)
   const pay = selling ?? mrp ?? 0
-  const specs = specificationEntries(product.title)
+  const specs = specificationEntries(prod.title)
+  const inStock = prod.stockCount > 0
+  const maxQty = prod.stockCount
+  const safeQty = inStock ? Math.min(Math.max(1, qty), maxQty) : 0
+
+  function handleAddToCart() {
+    if (!inStock || safeQty < 1) return
+    addItem(prod.id, safeQty)
+    navigate('/cart')
+  }
+
+  function handleBuyNow() {
+    if (!inStock || safeQty < 1) return
+    replaceCart([{ productId: prod.id, quantity: safeQty }])
+    navigate('/checkout')
+  }
 
   return (
-    <StoreLayout activeCategory={product.category}>
+    <StoreLayout activeCategory={prod.category}>
       <div className="mx-auto max-w-[1248px] px-4 py-4">
         <nav className="mb-4 flex flex-wrap items-center gap-1 text-xs text-zinc-600 md:text-sm">
           <Link to="/" className="hover:text-fk-blue">
@@ -103,35 +133,89 @@ export default function ProductDetailPage() {
           </Link>
           <span className="text-zinc-400">/</span>
           <Link
-            to={`/products?category=${encodeURIComponent(product.category)}`}
+            to={`/products?category=${encodeURIComponent(prod.category)}`}
             className="hover:text-fk-blue"
           >
-            {product.category}
+            {prod.category}
           </Link>
           <span className="text-zinc-400">/</span>
           <span className="line-clamp-1 font-medium text-zinc-800">{name}</span>
         </nav>
 
-        <div className="grid gap-6 rounded-sm bg-white p-4 shadow-sm md:grid-cols-[minmax(0,420px)_1fr] md:gap-10 md:p-8">
+        <div className="grid gap-6 rounded-sm bg-white p-4 shadow-sm md:grid-cols-[minmax(0,440px)_1fr] md:gap-10 md:p-8">
           <div>
             <div className="sticky top-24 flex flex-col gap-4">
-              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-sm border border-zinc-100 bg-white p-6">
+              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-sm border border-zinc-100 bg-white p-4">
                 <img
-                  src={product.url}
+                  src={images[activeImage] ?? prod.url}
                   alt=""
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
+              {images.length > 1 ? (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {images.map((src, i) => (
+                    <button
+                      key={src}
+                      type="button"
+                      onClick={() => setActiveImage(i)}
+                      className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 bg-white p-1 ${
+                        i === activeImage
+                          ? 'border-fk-blue'
+                          : 'border-zinc-200 hover:border-zinc-300'
+                      }`}
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        className="h-full w-full object-contain"
+                      />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              {inStock ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm text-zinc-600">Qty</span>
+                  <div className="flex items-center rounded-sm border border-zinc-300">
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 text-zinc-600 hover:bg-zinc-50 disabled:opacity-40"
+                      disabled={safeQty <= 1}
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    >
+                      −
+                    </button>
+                    <span className="min-w-[2.5rem] text-center text-sm font-semibold">
+                      {safeQty}
+                    </span>
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 text-zinc-600 hover:bg-zinc-50 disabled:opacity-40"
+                      disabled={safeQty >= maxQty}
+                      onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
               <div className="flex gap-3">
                 <button
                   type="button"
-                  className="flex-1 rounded-sm bg-fk-orange py-3 text-sm font-bold uppercase tracking-wide text-white shadow-sm hover:bg-orange-600"
+                  disabled={!inStock}
+                  onClick={handleAddToCart}
+                  className="flex-1 rounded-sm bg-fk-orange py-3 text-sm font-bold uppercase tracking-wide text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Add to cart
                 </button>
                 <button
                   type="button"
-                  className="flex-1 rounded-sm bg-fk-yellow py-3 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-sm hover:brightness-95"
+                  disabled={!inStock}
+                  onClick={handleBuyNow}
+                  className="flex-1 rounded-sm bg-fk-yellow py-3 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-sm hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Buy now
                 </button>
@@ -150,6 +234,18 @@ export default function ProductDetailPage() {
               <StarRow />
             </div>
 
+            <div
+              className={`mt-4 inline-flex items-center rounded-sm px-2 py-1 text-sm font-semibold ${
+                inStock
+                  ? 'bg-green-50 text-green-800'
+                  : 'bg-red-50 text-red-800'
+              }`}
+            >
+              {inStock
+                ? `In stock — ${prod.stockCount} available`
+                : 'Out of stock'}
+            </div>
+
             <div className="mt-6 flex flex-wrap items-baseline gap-3">
               <span className="text-3xl font-semibold text-zinc-900">
                 {formatInr(pay)}
@@ -160,14 +256,14 @@ export default function ProductDetailPage() {
                     {formatInr(mrp)}
                   </span>
                   <span className="rounded-sm bg-green-100 px-1.5 py-0.5 text-sm font-semibold text-green-800">
-                    {product.discount}
+                    {prod.discount}
                   </span>
                 </>
               ) : null}
             </div>
 
             <p className="mt-2 text-sm font-medium text-green-700">
-              {product.tagline}
+              {prod.tagline}
             </p>
 
             <div className="mt-8 border-t border-zinc-100 pt-6">
@@ -205,7 +301,7 @@ export default function ProductDetailPage() {
             <div className="mt-8 border-t border-zinc-100 pt-6">
               <h2 className="text-lg font-semibold text-zinc-900">Product details</h2>
               <p className="mt-3 text-sm leading-relaxed text-zinc-700">
-                {product.description}
+                {prod.description}
               </p>
             </div>
 
@@ -222,7 +318,7 @@ export default function ProductDetailPage() {
                     >
                       <dt className="text-zinc-500">{row.key}</dt>
                       <dd className="font-medium text-zinc-900">{row.value}</dd>
-                  </div>
+                    </div>
                   ))}
                 </dl>
               </div>

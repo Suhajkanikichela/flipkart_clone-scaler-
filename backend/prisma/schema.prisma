@@ -65,6 +65,14 @@ model Order {
   status      String      @default("PENDING")
   createdAt   DateTime    @default(now())
 
+  shippingFullName  String?
+  shippingPhone     String?
+  shippingLine1     String?
+  shippingLine2     String?
+  shippingCity      String?
+  shippingState     String?
+  shippingPincode   String?
+
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 }

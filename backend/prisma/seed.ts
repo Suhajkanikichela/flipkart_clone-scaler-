@@ -516,6 +516,19 @@ async function main() {
   const total = await prisma.product.count();
   console.log(`Seed complete: ${total} products (${HOME_CATEGORIES.length} categories × 5).`);
 
+  await prisma.user.upsert({
+    where: { email: "guest@flipkart.demo" },
+    create: {
+      firstname: "Guest",
+      lastname: "Shopper",
+      username: "guest_shopper",
+      email: "guest@flipkart.demo",
+      password: "unused",
+    },
+    update: {},
+  });
+  console.log("Guest checkout user ensured (guest@flipkart.demo).");
+
   await prisma.$disconnect();
 }
 

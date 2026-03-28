@@ -1,3 +1,4 @@
+import type { Product } from '@/types/product'
 import type { ProductJson } from '@/types/product'
 
 export function getProductName(title: ProductJson): string {
@@ -32,6 +33,13 @@ export function formatInr(amount: number): string {
     currency: 'INR',
     maximumFractionDigits: 0,
   }).format(amount)
+}
+
+export function getProductImages(product: Product): string[] {
+  if (product.images && product.images.length > 0) {
+    return product.images
+  }
+  return [product.url]
 }
 
 export function specificationEntries(title: ProductJson): { key: string; value: string }[] {

@@ -12,4 +12,6 @@ export type Product = {
   description: string
   discount: string
   tagline: string
+  /** Gallery URLs from API (primary image + alternates) */
+  images?: string[]
 }
