@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@theme {
+  --color-fk-blue: #2874f0;
+  --color-fk-blue-dark: #1d5fc4;
+  --color-fk-orange: #fb641b;
+  --color-fk-yellow: #ffe11b;
+  --color-fk-bg: #f1f3f6;
+  --font-fk: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-fk);
+  background-color: var(--color-fk-bg);
+}

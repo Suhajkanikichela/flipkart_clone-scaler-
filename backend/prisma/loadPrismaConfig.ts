@@ -22,6 +22,7 @@ export default defineConfig({
   schema: path.join(backendRoot, "prisma", "schema.prisma"),
   migrations: {
     path: path.join(backendRoot, "prisma", "migrations"),
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
     url: databaseUrl,

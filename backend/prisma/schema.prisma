@@ -28,18 +28,21 @@ model User {
 
 model Product {
   id          String     @id
+  category    String
   url         String
   detailUrl   String
   title       Json
   price       Json
   quantity    Int
-  stockCount      Int
+  stockCount  Int
   description String
   discount    String
   tagline     String
 
   cartItems   CartItem[]
   orderItems  OrderItem[]
+
+  @@index([category])
 }
 
 model CartItem {
