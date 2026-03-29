@@ -90,7 +90,7 @@ export function DealsSection() {
           </div>
           <Link
             to="/deals"
-            className="rounded-sm bg-fk-blue px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-sm hover:bg-fk-blue-dark md:px-5 md:text-sm"
+            className="rounded-sm bg-fk-blue px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-sm transition hover:scale-105 hover:bg-fk-blue-dark hover:shadow-md active:scale-100 md:px-5 md:text-sm"
           >
             View All
           </Link>
@@ -125,13 +125,13 @@ export function DealsSection() {
                     <Link
                       key={product.id}
                       to={`/product/${encodeURIComponent(product.id)}`}
-                      className="min-w-[45%] flex-[0_0_45%] snap-start border-r border-[var(--color-fk-card-border)] bg-white p-3 transition-colors last:border-r-0 hover:bg-zinc-50/80 sm:min-w-[33%] sm:flex-[0_0_33%] md:min-w-0 md:flex-1 md:border-r md:last:border-r-0"
+                      className="group min-w-[45%] flex-[0_0_45%] snap-start border-r border-[var(--color-fk-card-border)] bg-white p-3 transition-all duration-200 last:border-r-0 hover:z-10 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] active:translate-y-0 active:shadow-sm sm:min-w-[33%] sm:flex-[0_0_33%] md:min-w-0 md:flex-1 md:border-r md:last:border-r-0"
                     >
-                      <div className="relative mx-auto flex aspect-square w-full max-w-[130px] items-center justify-center rounded-sm bg-[var(--color-fk-image-well)] p-2">
+                      <div className="relative mx-auto flex aspect-square w-full max-w-[130px] items-center justify-center overflow-hidden rounded-sm bg-[var(--color-fk-image-well)] p-2">
                         <img
                           src={product.url}
                           alt=""
-                          className="max-h-full max-w-full object-contain"
+                          className="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-105"
                           loading="lazy"
                         />
                         {product.discount ? (

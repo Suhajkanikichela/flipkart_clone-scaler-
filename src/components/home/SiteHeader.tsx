@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { IconCart, IconChevronDown, IconSearch } from './icons'
 
@@ -8,6 +9,7 @@ export function SiteHeader() {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const { itemCount } = useCart()
+  const { user, ready, logout } = useAuth()
   const [search, setSearch] = useState('')
 
   useEffect(() => {
@@ -65,13 +67,38 @@ export function SiteHeader() {
         </form>
 
         <nav className="hidden items-center gap-1 text-[15px] font-medium text-zinc-800 md:flex">
-          <button
-            type="button"
-            className="flex items-center gap-0.5 rounded-sm px-4 py-1.5 hover:bg-fk-bg"
-          >
-            Login
-            <IconChevronDown className="h-4 w-4 text-fk-blue" />
-          </button>
+          {!ready ? (
+            <span className="px-4 py-1.5 text-sm text-zinc-400">…</span>
+          ) : user ? (
+            <div className="flex items-center gap-2">
+              <span className="max-w-[140px] truncate text-sm text-zinc-800" title={user.email}>
+                Hi {user.firstname}
+              </span>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="rounded-sm px-3 py-1.5 text-sm font-semibold text-fk-blue hover:bg-fk-bg"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-0.5">
+              <Link
+                to="/login"
+                className="flex items-center gap-0.5 rounded-sm px-4 py-1.5 hover:bg-fk-bg"
+              >
+                Login
+                <IconChevronDown className="h-4 w-4 text-fk-blue" />
+              </Link>
+              <Link
+                to="/signup"
+                className="ml-1 rounded-sm px-2 py-1.5 text-sm text-fk-blue hover:underline"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
           <a href="#" className="whitespace-nowrap px-3 py-1.5 hover:text-fk-blue">
             Become a Seller
           </a>
@@ -95,6 +122,25 @@ export function SiteHeader() {
             ) : null}
           </Link>
         </nav>
+
+        {ready && user ? (
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="shrink-0 text-xs font-semibold text-fk-blue md:hidden"
+          >
+            Logout
+          </button>
+        ) : ready && !user ? (
+          <Link
+            to="/login"
+            className="shrink-0 text-sm font-semibold text-fk-blue md:hidden"
+          >
+            Login
+          </Link>
+        ) : (
+          <span className="shrink-0 text-zinc-300 md:hidden">…</span>
+        )}
 
         <Link
           to="/cart"

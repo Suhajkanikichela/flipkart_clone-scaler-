@@ -18,14 +18,16 @@ export function CategoryStrip({ activeCategory }: Props) {
             <Link
               key={label}
               to={`/products?category=${encodeURIComponent(label)}`}
-              className={`flex min-w-[72px] flex-col items-center gap-1.5 text-center md:min-w-0 ${
-                isActive ? 'rounded-md bg-fk-bg/80 ring-1 ring-fk-blue/30' : ''
+              className={`group flex min-w-[72px] flex-col items-center gap-1.5 rounded-md py-1 text-center transition md:min-w-0 ${
+                isActive
+                  ? 'bg-fk-bg/80 ring-1 ring-fk-blue/30'
+                  : 'hover:bg-fk-bg/60'
               }`}
             >
-              <span className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gradient-to-b from-fk-bg to-white text-3xl shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] md:h-[72px] md:w-[72px]">
+              <span className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gradient-to-b from-fk-bg to-white text-3xl shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] transition duration-200 group-hover:scale-110 group-hover:shadow-md group-active:scale-95 md:h-[72px] md:w-[72px]">
                 {emoji}
               </span>
-              <span className="max-w-[76px] text-[12px] font-semibold leading-tight text-zinc-800 md:text-[13px]">
+              <span className="max-w-[76px] text-[12px] font-semibold leading-tight text-zinc-800 transition group-hover:text-fk-blue md:text-[13px]">
                 {label}
               </span>
             </Link>

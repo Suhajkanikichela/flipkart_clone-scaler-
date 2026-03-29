@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import authRoutes from "./routes/auth.routes";
 import cartRoutes from "./routes/cart.routes";
 import orderRoutes from "./routes/orders.routes";
 import productRoutes, {
@@ -19,6 +20,8 @@ app.use(
   }),
 );
 app.use(express.json());
+
+app.use("/auth", authRoutes);
 
 // Register before `app.use("/products", …)` so Express 5 does not treat `random` / `shuffled`
 // as `/:id` inside the mounted router (which caused 404s).
