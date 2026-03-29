@@ -12,13 +12,7 @@ import productRoutes, {
 const app = express();
 
 // Allow any dev origin (Vite port/host) so /cart/preview POST is not blocked by CORS.
-app.use(
-  cors({
-    origin: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
+app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);

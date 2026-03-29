@@ -14,6 +14,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    // Listen on 0.0.0.0 — open via localhost, LAN IP, or tunnels.
+    host: true,
+    // Accept any Host header (ngrok, Cloudflare Tunnel, custom domains).
+    allowedHosts: true,
+  },
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
