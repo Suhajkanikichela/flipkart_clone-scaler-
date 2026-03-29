@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { placeOrder } from '@/api/orders'
 import { postCartPreview } from '@/api/cart'
@@ -20,6 +20,8 @@ const initialForm = {
 export default function CheckoutPage() {
   const navigate = useNavigate()
   const { lines, clearCart, removeItems, setLineQuantity } = useCart()
+  /** Prevents redirect-to-cart when cart is cleared after a successful order. */
+  const allowEmptyCartRedirect = useRef(true)
   const [form, setForm] = useState(initialForm)
   const [preview, setPreview] = useState<CartPreviewResponse | null>(null)
   const [loadingPreview, setLoadingPreview] = useState(true)
@@ -57,6 +59,7 @@ export default function CheckoutPage() {
   }, [lines, removeItems, setLineQuantity])
 
   useEffect(() => {
+    if (!allowEmptyCartRedirect.current) return
     if (!loadingPreview && lines.length === 0) {
       navigate('/cart', { replace: true })
     }
@@ -81,8 +84,12 @@ export default function CheckoutPage() {
         state: form.state.trim(),
         pincode: form.pincode.trim(),
       })
+      allowEmptyCartRedirect.current = false
+      navigate(`/order-confirmation/${order.id}`, {
+        replace: true,
+        state: { order },
+      })
       clearCart()
-      navigate(`/order-confirmation/${order.id}`, { replace: true })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Order could not be placed')
     } finally {
@@ -112,7 +119,7 @@ export default function CheckoutPage() {
         <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_360px]">
           <form
             onSubmit={handleSubmit}
-            className="space-y-6 rounded-sm border border-zinc-200 bg-white p-6 shadow-sm"
+            className="space-y-6 rounded-sm border border-[var(--color-fk-card-border)] bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
           >
             <h2 className="text-lg font-semibold text-zinc-900">
               Delivery address
@@ -210,7 +217,7 @@ export default function CheckoutPage() {
           </form>
 
           <div className="h-fit space-y-4">
-            <div className="rounded-sm border border-zinc-200 bg-white p-4 shadow-sm">
+            <div className="rounded-sm border border-[var(--color-fk-card-border)] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
               <h2 className="text-sm font-semibold text-zinc-500">
                 ORDER SUMMARY
               </h2>

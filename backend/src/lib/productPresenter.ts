@@ -1,15 +1,18 @@
 import type { Product } from "../generated/prisma/client";
+import { galleryUrlsForProduct } from "../../prisma/productImageUrls";
 
 export type ProductDto = Product & { images: string[] };
 
 export function toProductDto(product: Product): ProductDto {
-  const images = [
-    product.url,
-    ...[1, 2, 3].map(
-      (i) =>
-        `https://picsum.photos/seed/${encodeURIComponent(`${product.id}-g${i}`)}/800/800`,
-    ),
-  ];
+  const extra = galleryUrlsForProduct(product).filter(
+    (u) => u && u !== product.url,
+  );
+  const images: string[] = [product.url];
+  for (const u of extra) {
+    if (images.length >= 4) break;
+    if (!images.includes(u)) images.push(u);
+  }
+  while (images.length < 4) images.push(product.url);
   return { ...product, images };
 }
 

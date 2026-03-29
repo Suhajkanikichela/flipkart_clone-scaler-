@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec \"npx tsx\" src/index.ts",
+    "start": "tsx watch src/index.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:pull": "prisma db pull",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db:update-images": "npx tsx prisma/update-product-images.ts"
   },
   "keywords": [],
   "author": "",

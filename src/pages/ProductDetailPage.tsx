@@ -142,10 +142,10 @@ export default function ProductDetailPage() {
           <span className="line-clamp-1 font-medium text-zinc-800">{name}</span>
         </nav>
 
-        <div className="grid gap-6 rounded-sm bg-white p-4 shadow-sm md:grid-cols-[minmax(0,440px)_1fr] md:gap-10 md:p-8">
+        <div className="grid gap-6 rounded-sm border border-[var(--color-fk-card-border)] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)] md:grid-cols-[minmax(0,440px)_1fr] md:gap-10 md:p-8">
           <div>
             <div className="sticky top-24 flex flex-col gap-4">
-              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-sm border border-zinc-100 bg-white p-4">
+              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-sm border border-[var(--color-fk-card-border)] bg-[var(--color-fk-image-well)] p-4">
                 <img
                   src={images[activeImage] ?? prod.url}
                   alt=""
@@ -159,10 +159,10 @@ export default function ProductDetailPage() {
                       key={src}
                       type="button"
                       onClick={() => setActiveImage(i)}
-                      className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 bg-white p-1 ${
+                      className={`h-16 w-16 shrink-0 overflow-hidden rounded-sm border-2 bg-[var(--color-fk-image-well)] p-1 ${
                         i === activeImage
                           ? 'border-fk-blue'
-                          : 'border-zinc-200 hover:border-zinc-300'
+                          : 'border-[var(--color-fk-card-border)] hover:border-zinc-300'
                       }`}
                     >
                       <img
@@ -177,7 +177,12 @@ export default function ProductDetailPage() {
 
               {inStock ? (
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm text-zinc-600">Qty</span>
+                  <span className="text-sm text-zinc-600">
+                    Qty
+                    <span className="ml-1.5 font-normal text-zinc-500">
+                      (max {maxQty} in stock)
+                    </span>
+                  </span>
                   <div className="flex items-center rounded-sm border border-zinc-300">
                     <button
                       type="button"
@@ -235,15 +240,22 @@ export default function ProductDetailPage() {
             </div>
 
             <div
-              className={`mt-4 inline-flex items-center rounded-sm px-2 py-1 text-sm font-semibold ${
+              className={`mt-4 flex flex-col gap-0.5 rounded-sm px-3 py-2 text-sm sm:flex-row sm:items-center sm:gap-3 ${
                 inStock
                   ? 'bg-green-50 text-green-800'
                   : 'bg-red-50 text-red-800'
               }`}
             >
-              {inStock
-                ? `In stock — ${prod.stockCount} available`
-                : 'Out of stock'}
+              <span className="font-semibold">
+                {inStock ? 'In stock' : 'Out of stock'}
+              </span>
+              {inStock ? (
+                <span className="font-medium tabular-nums text-green-900">
+                  {prod.stockCount} units available
+                </span>
+              ) : (
+                <span className="text-red-900">0 units — check back later</span>
+              )}
             </div>
 
             <div className="mt-6 flex flex-wrap items-baseline gap-3">
@@ -302,6 +314,21 @@ export default function ProductDetailPage() {
               <h2 className="text-lg font-semibold text-zinc-900">Product details</h2>
               <p className="mt-3 text-sm leading-relaxed text-zinc-700">
                 {prod.description}
+              </p>
+            </div>
+
+            <div className="mt-8 border-t border-zinc-100 pt-6">
+              <h2 className="text-lg font-semibold text-zinc-900">Availability</h2>
+              <p className="mt-3 text-sm text-zinc-700">
+                <span className="font-medium text-zinc-900">Stock: </span>
+                <span className="tabular-nums font-semibold text-zinc-900">
+                  {prod.stockCount}
+                </span>
+                <span className="text-zinc-600">
+                  {' '}
+                  {prod.stockCount === 1 ? 'unit' : 'units'} in inventory
+                  {inStock ? '' : ' — cannot add to cart right now'}
+                </span>
               </p>
             </div>
 

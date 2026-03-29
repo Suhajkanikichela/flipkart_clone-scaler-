@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma, PrismaClient } from "../src/generated/prisma/client";
+import { primaryImageUrlForProductId } from "./productImageUrls";
 
 /** Must match `CategoryStrip` labels on the home page */
 export const HOME_CATEGORIES = [
@@ -479,7 +480,10 @@ async function main() {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]!;
       const id = buildProductId(category, i);
-      const url = `https://picsum.photos/seed/${encodeURIComponent(id)}/512/512`;
+      const url = primaryImageUrlForProductId(id);
+      if (!url) {
+        throw new Error(`Missing primary image URL for product id "${id}"`);
+      }
       const detailUrl = `/products/${id}`;
 
       await prisma.product.upsert({

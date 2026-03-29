@@ -101,11 +101,11 @@ export default function CartPage() {
                   return (
                     <div
                       key={row.product.id}
-                      className="flex gap-4 rounded-sm border border-zinc-200 bg-white p-4 shadow-sm"
+                      className="flex gap-4 rounded-sm border border-[var(--color-fk-card-border)] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
                     >
                       <Link
                         to={`/product/${encodeURIComponent(row.product.id)}`}
-                        className="h-28 w-28 shrink-0 overflow-hidden rounded-sm border border-zinc-100 bg-white p-1"
+                        className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-[var(--color-fk-card-border)] bg-[var(--color-fk-image-well)] p-2"
                       >
                         <img
                           src={row.product.url}
@@ -180,7 +180,7 @@ export default function CartPage() {
             </div>
 
             {preview && !loading ? (
-              <div className="h-fit rounded-sm border border-zinc-200 bg-white p-4 shadow-sm lg:sticky lg:top-28">
+              <div className="h-fit rounded-sm border border-[var(--color-fk-card-border)] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)] lg:sticky lg:top-28">
                 <h2 className="text-sm font-semibold text-zinc-500">
                   PRICE DETAILS
                 </h2>

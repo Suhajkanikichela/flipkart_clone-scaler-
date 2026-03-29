@@ -85,7 +85,7 @@ export default function ProductListPage() {
           </span>
         </nav>
 
-        <div className="mb-6 flex flex-col gap-4 rounded-sm border border-zinc-200 bg-white p-4 shadow-sm md:flex-row md:items-end md:justify-between">
+        <div className="mb-6 flex flex-col gap-4 rounded-sm border border-[var(--color-fk-card-border)] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)] md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="text-xl font-semibold text-zinc-900 md:text-2xl">
               {heading}
@@ -138,23 +138,27 @@ export default function ProductListPage() {
         ) : null}
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-[300px] animate-pulse rounded-sm bg-zinc-200/80"
-              />
-            ))}
+          <div className="rounded-sm border border-[var(--color-fk-card-border)] bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[300px] animate-pulse rounded-sm bg-[var(--color-fk-image-well)]"
+                />
+              ))}
+            </div>
           </div>
         ) : products.length === 0 ? (
           <div className="rounded-sm border border-dashed border-zinc-300 bg-white px-6 py-16 text-center text-zinc-600">
             No products match your filters.
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+          <div className="rounded-sm border border-[var(--color-fk-card-border)] bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
           </div>
         )}
       </div>

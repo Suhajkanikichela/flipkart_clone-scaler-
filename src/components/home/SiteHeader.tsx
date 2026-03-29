@@ -31,7 +31,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-[var(--color-fk-card-border)] bg-white shadow-[0_1px_1px_rgba(0,0,0,0.06)]">
       <div className="mx-auto flex max-w-[1248px] items-center gap-3 px-4 py-3 md:gap-6">
         <Link to="/" className="shrink-0 select-none">
           <div className="flex flex-col leading-none">
